@@ -47,6 +47,24 @@ WordCount *word_counts = NULL;
 int num_words(FILE* infile) {
   int num_words = 0;
 
+  char character;
+  FILE * fhandle = infile;
+  if (fhandle == NULL) {
+    printf("problem");
+  }
+
+  int lengthCurrentWord = 0;
+  while ((character = fgetc(fhandle)) != EOF) {
+
+    if (character != ' ' && isalpha(character)) {
+      lengthCurrentWord++;
+    }
+    if (character == ' ' && lengthCurrentWord > 1) {
+      num_words++;
+      lengthCurrentWord = 0;
+    } 
+  }
+
   return num_words;
 }
 
@@ -57,6 +75,28 @@ int num_words(FILE* infile) {
  * Useful functions: fgetc(), isalpha(), tolower(), add_word().
  */
 void count_words(WordCount **wclist, FILE *infile) {
+
+  char character;
+  char * word = malloc(sizeof(char) * MAX_WORD_LEN);
+  //char * word[MAX_WORD_LEN];
+
+  int lengthCurrentWord = 0;
+
+  while ((character = fgetc(infile)) != EOF) {
+
+      if (character != ' ' && isalpha(character) && lengthCurrentWord < MAX_WORD_LEN) {
+        word[lengthCurrentWord] = character;
+        lengthCurrentWord++;
+      }
+
+      if (character == ' ' && lengthCurrentWord > 1) {
+        add_word(wclist, word);
+        
+        word = realloc(word, sizeof(char) * MAX_WORD_LEN);
+        lengthCurrentWord = 0;
+      } 
+  }
+
 }
 
 /*
@@ -64,7 +104,16 @@ void count_words(WordCount **wclist, FILE *infile) {
  * Useful function: strcmp().
  */
 static bool wordcount_less(const WordCount *wc1, const WordCount *wc2) {
-  return 0;
+  if (wc1->count < wc2->count) {
+    return 1;
+  }
+  else if (wc1->count > wc2->count) {
+    return 0;
+  } 
+  else {
+    // wcA = wcB in terms of count
+    return strcmp(wc1->word, wc2->word);
+  }
 }
 
 // In trying times, displays a helpful message.
@@ -131,6 +180,16 @@ int main (int argc, char *argv[]) {
     // At least one file specified. Useful functions: fopen(), fclose().
     // The first file can be found at argv[optind]. The last file can be
     // found at argv[argc-1].
+    FILE* fileHandle = fopen(argv[optind], 'r');
+
+    if (count_mode) {
+      total_words = num_words(fileHandle);
+    }
+    if (freq_mode) {
+      word_counts = count_words(word_counts, fileHandle);
+    }
+
+    fclose(fileHandle);
   }
 
   if (count_mode) {

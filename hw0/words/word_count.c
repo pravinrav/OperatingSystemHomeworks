@@ -34,18 +34,44 @@ void init_words(WordCount **wclist) {
 }
 
 size_t len_words(WordCount *wchead) {
-    size_t len = 0;
-    return len;
+  if (wchead == NULL) {
+    return 0;
+  }
+  return 1 + len_words(wchead->next);
 }
 
 WordCount *find_word(WordCount *wchead, char *word) {
   /* Return count for word, if it exists */
-  WordCount *wc = NULL;
-  return wc;
+  WordCount *wc = wchead;
+  while (wc != NULL) {
+    if (wc->word == word) {
+      return wc;
+    }
+  }
+  return NULL;
 }
 
 void add_word(WordCount **wclist, char *word) {
   /* If word is present in word_counts list, increment the count, otw insert with count 1. */
+  WordCount* node = find_word(*wclist, *word);
+  if (node != NULL) {
+    node->count = node->count + 1;
+  }
+  else {
+    //wordcount_sort(WordCount **wclist, bool less(const WordCount *, const WordCount *))
+    wordcount_sort(wclist, wordcount_less);
+
+    // Create new WordCount object
+    WordCount* countObject = (WordCount *) malloc(sizeof(WordCount));
+    countObject->word = word;
+    countObject->count = 1;
+    countObject->next = NULL;
+
+
+    // wordcount_insert_ordered(WordCount **wclist, WordCount *elem, bool less(const WordCount *, const WordCount *));
+    wordcount_insert_ordered(wclist, countObject, wordcount_less);
+  }
+
 }
 
 void fprint_words(WordCount *wchead, FILE *ofile) {
