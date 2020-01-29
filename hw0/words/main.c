@@ -180,16 +180,16 @@ int main (int argc, char *argv[]) {
     // At least one file specified. Useful functions: fopen(), fclose().
     // The first file can be found at argv[optind]. The last file can be
     // found at argv[argc-1].
-    FILE* fileHandle = fopen(argv[optind], 'r');
+    infile = fopen(argv[optind], "r");
 
     if (count_mode) {
-      total_words = num_words(fileHandle);
+      total_words = num_words(infile);
     }
     if (freq_mode) {
-      word_counts = count_words(word_counts, fileHandle);
+      count_words(&word_counts, infile);
     }
 
-    fclose(fileHandle);
+    fclose(infile);
   }
 
   if (count_mode) {

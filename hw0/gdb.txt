@@ -1,40 +1,57 @@
 GDB Practice:
 
-a.
+a. cgdb map
 
-b.
+b. b 15 (sets breakpoint at line )
 
-c.
+c. run
 
-d.
+d. 
 
-    *
+  * argv is an array of strings. In this case the length of argv is 1 since argc = 1. 
+
+	If one executes:
+
+	p argv
+	$1 = (char **) 0x7fffffffe4d8
+
+	0x7fffffffe4d8 is the memory address which points to the first string "map".
 
 e.
 
+  * If one executes:
+
+	p *argv
+	$3 = 0x7fffffffe711 "/home/vagrant/code/personal/hw0/map"
+
+	we find that "/home/vagrant/code/personal/hw0/map" is at the address of argv. 
+
+f. Use the command next to step until recur.  
+
+g. 
+
+  * We can get the address of the function recur by doing 
+
+  p recur
+  $2 = {int (int)} 0x5555555546cd <recur>
+
+  The address of recur is at 0x5555555546cd. 
+
+h. Run "step"
+
+i. Reached the if statement.
+
+j. I DON'T KNOW
+
+k. I DON'T KNOW
+
+l. I DON'T KNOW
+
     *
 
-f.
+m. I DON'T KNOW
 
-g.
-
-    *
-
-h.
-
-i.
-
-j.
-
-k.
-
-l.
-
-    *
-
-m.
-
-n.
+n. I DON'T KNOW
 
 o.
 

@@ -51,9 +51,23 @@ WordCount *find_word(WordCount *wchead, char *word) {
   return NULL;
 }
 
+
+static bool wordcount_less(const WordCount *wc1, const WordCount *wc2) {
+  if (wc1->count < wc2->count) {
+    return 1;
+  }
+  else if (wc1->count > wc2->count) {
+    return 0;
+  } 
+  else {
+    // wcA = wcB in terms of count
+    return strcmp(wc1->word, wc2->word);
+  }
+}
+
 void add_word(WordCount **wclist, char *word) {
   /* If word is present in word_counts list, increment the count, otw insert with count 1. */
-  WordCount* node = find_word(*wclist, *word);
+  WordCount* node = find_word(*wclist, word);
   if (node != NULL) {
     node->count = node->count + 1;
   }
