@@ -190,6 +190,9 @@ int main (int argc, char *argv[]) {
     if (count_mode) {
       total_words = num_words(infile);
     }
+    if (freq_mode) {
+      count_words(&word_counts, infile);
+    }
 
   } else {
     // At least one file specified. Useful functions: fopen(), fclose().
