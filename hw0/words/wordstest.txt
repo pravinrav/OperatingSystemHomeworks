@@ -1,5 +1,1 @@
-abc
-def
-abc
-abc
-def
+abc\ndef\nabc\nabc\ndef\n
