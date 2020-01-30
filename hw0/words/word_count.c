@@ -81,7 +81,7 @@ void add_word(WordCount **wclist, char *word) {
     countObject->count = 1;
     countObject->next = *wclist;
 
-
+    wordcount_sort(wclist, wordcount_less);
     // wordcount_insert_ordered(WordCount **wclist, WordCount *elem, bool less(const WordCount *, const WordCount *));
     // wordcount_insert_ordered(wclist, countObject, wordcount_less);
   }

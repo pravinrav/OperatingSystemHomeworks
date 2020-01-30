@@ -97,6 +97,7 @@ void count_words(WordCount **wclist, FILE *infile) {
 
       if (!isalpha(character) && lengthCurrentWord > 1) {
         add_word(wclist, word);
+        
 
         word = realloc(word, sizeof(char) * (MAX_WORD_LEN + 1));
         lengthCurrentWord = 0;
