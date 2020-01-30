@@ -1,1 +1,1 @@
-abc\ndef\nabc\nabc\ndef\n
+a b c
