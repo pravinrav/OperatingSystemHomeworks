@@ -62,7 +62,11 @@ int num_words(FILE* infile) {
     if (!isalpha(character) && lengthCurrentWord > 1) {
       num_words++;
       lengthCurrentWord = 0;
-    } else {
+    }
+    else if (!isalpha(character) && lengthCurrentWord <= 1) {
+      lengthCurrentWord = 0;
+    }
+    else if (isalpha(character)) {
       lengthCurrentWord++;
     }
 
