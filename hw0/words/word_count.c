@@ -44,7 +44,7 @@ WordCount *find_word(WordCount *wchead, char *word) {
   /* Return count for word, if it exists */
   WordCount *wc = wchead;
   while (wc != NULL) {
-    if (wc->word == word) {
+    if (strcmp(wc->word, word) == 0) {
       return wc;
     }
   }
@@ -77,13 +77,13 @@ void add_word(WordCount **wclist, char *word) {
 
     // Create new WordCount object
     WordCount* countObject = (WordCount *) malloc(sizeof(WordCount));
-    countObject->word = word;
+    countObject->word = new_string(word);
     countObject->count = 1;
-    countObject->next = NULL;
+    countObject->next = *wclist;
 
 
     // wordcount_insert_ordered(WordCount **wclist, WordCount *elem, bool less(const WordCount *, const WordCount *));
-    wordcount_insert_ordered(wclist, countObject, wordcount_less);
+    // wordcount_insert_ordered(wclist, countObject, wordcount_less);
   }
 
 }

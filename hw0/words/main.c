@@ -88,24 +88,44 @@ int num_words(FILE* infile) {
 void count_words(WordCount **wclist, FILE *infile) {
 
   char character;
-  char * word = malloc(sizeof(char) * MAX_WORD_LEN);
+  char * word = malloc(sizeof(char) * (MAX_WORD_LEN + 1));
   //char * word[MAX_WORD_LEN];
 
   int lengthCurrentWord = 0;
 
   while ((character = fgetc(infile)) != EOF) {
 
-      if (character != ' ' && isalpha(character) && lengthCurrentWord < MAX_WORD_LEN) {
+      if (!isalpha(character) && lengthCurrentWord > 1) {
+        add_word(wclist, word);
+
+        word = realloc(word, sizeof(char) * (MAX_WORD_LEN + 1));
+        lengthCurrentWord = 0;
+      }
+      else if (!isalpha(character) && lengthCurrentWord <= 1) {
+        word = realloc(word, sizeof(char) * (MAX_WORD_LEN + 1));
+        lengthCurrentWord = 0;
+      }
+      else if (isalpha(character)) {
         word[lengthCurrentWord] = character;
         lengthCurrentWord++;
       }
 
-      if (character == ' ' && lengthCurrentWord > 1) {
-        add_word(wclist, word);
+      // if (character != ' ' && isalpha(character) && lengthCurrentWord < MAX_WORD_LEN) {
+      //   word[lengthCurrentWord] = character;
+      //   lengthCurrentWord++;
+      // }
+
+      // if (character == ' ' && lengthCurrentWord > 1) {
+      //   add_word(wclist, word);
         
-        word = realloc(word, sizeof(char) * MAX_WORD_LEN);
-        lengthCurrentWord = 0;
-      } 
+      //   word = realloc(word, sizeof(char) * MAX_WORD_LEN);
+      //   lengthCurrentWord = 0;
+      // }
+
+  }
+
+  if (character == EOF && lengthCurrentWord > 1) {
+    add_word(wclist, word);
   }
 
 }
