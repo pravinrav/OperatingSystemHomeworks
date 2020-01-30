@@ -68,7 +68,7 @@ int num_words(FILE* infile) {
 
   }
 
-  if (character == FEOF && lengthCurrentWord > 1) {
+  if (character == EOF && lengthCurrentWord > 1) {
     num_words++;
   }
 
