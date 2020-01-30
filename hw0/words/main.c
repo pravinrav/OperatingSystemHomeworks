@@ -88,22 +88,50 @@ int num_words(FILE* infile) {
 void count_words(WordCount **wclist, FILE *infile) {
 
   char character;
-  char * word = malloc(sizeof(char) * (MAX_WORD_LEN + 1));
+  char word[65]; 
+  memset(word, 0, 65);
+
+  //char * word = calloc(MAX_WORD_LEN + 1, sizeof(char));
   //char * word[MAX_WORD_LEN];
 
   int lengthCurrentWord = 0;
 
   while ((character = fgetc(infile)) != EOF) {
 
+      if (isalpha(character)) {
+        character = tolower(character);
+      }
+
+      if (character == '\\') {
+        char nextchar = fgetc(infile);
+        if (nextchar == 'n' || nextchar == 't' || nextchar == 's') {
+          
+          if (lengthCurrentWord > 1) {
+            add_word(wclist, word);
+          }
+
+
+          memset(word, 0, 65);
+          lengthCurrentWord = 0;
+          continue;
+        }
+
+      }
+
       if (!isalpha(character) && lengthCurrentWord > 1) {
         add_word(wclist, word);
-        
 
-        word = realloc(word, sizeof(char) * (MAX_WORD_LEN + 1));
+
+        //word = realloc(word, sizeof(char) * (MAX_WORD_LEN + 1));
+        //free(word);
+        //char * word = calloc(MAX_WORD_LEN + 1, sizeof(char));
+        memset(word, 0, 65);
         lengthCurrentWord = 0;
       }
       else if (!isalpha(character) && lengthCurrentWord <= 1) {
-        word = realloc(word, sizeof(char) * (MAX_WORD_LEN + 1));
+        memset(word, 0, 65);
+        //free(word);
+        //char * word = calloc(MAX_WORD_LEN + 1, sizeof(char));
         lengthCurrentWord = 0;
       }
       else if (isalpha(character)) {

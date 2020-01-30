@@ -47,6 +47,7 @@ WordCount *find_word(WordCount *wchead, char *word) {
     if (strcmp(wc->word, word) == 0) {
       return wc;
     }
+    wc = wc->next;
   }
   return NULL;
 }
@@ -73,15 +74,15 @@ void add_word(WordCount **wclist, char *word) {
   }
   else {
     //wordcount_sort(WordCount **wclist, bool less(const WordCount *, const WordCount *))
-    wordcount_sort(wclist, wordcount_less);
 
     // Create new WordCount object
     WordCount* countObject = (WordCount *) malloc(sizeof(WordCount));
     countObject->word = new_string(word);
     countObject->count = 1;
     countObject->next = *wclist;
+    *wclist = countObject;
 
-    wordcount_sort(wclist, wordcount_less);
+    // wordcount_sort(wclist, wordcount_less);
     // wordcount_insert_ordered(WordCount **wclist, WordCount *elem, bool less(const WordCount *, const WordCount *));
     // wordcount_insert_ordered(wclist, countObject, wordcount_less);
   }
