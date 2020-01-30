@@ -68,6 +68,10 @@ int num_words(FILE* infile) {
 
   }
 
+  if (character == FEOF && lengthCurrentWord > 1) {
+    num_words++;
+  }
+
   return num_words;
 }
 
