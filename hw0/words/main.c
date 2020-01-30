@@ -56,13 +56,16 @@ int num_words(FILE* infile) {
   int lengthCurrentWord = 0;
   while ((character = fgetc(fhandle)) != EOF) {
 
-    if (character != ' ' && isalpha(character)) {
-      lengthCurrentWord++;
-    }
-    if (character == ' ' && lengthCurrentWord > 1) {
+    //if (isalpha(character) ) {
+      //lengthCurrentWord++;
+    //}
+    if (!isalpha(character) && lengthCurrentWord > 1) {
       num_words++;
       lengthCurrentWord = 0;
-    } 
+    } else if (isalpha(character)) {
+      lengthCurrentWord++;
+    }
+
   }
 
   return num_words;
