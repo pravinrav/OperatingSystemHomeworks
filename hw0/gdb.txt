@@ -41,40 +41,81 @@ h. Run "step"
 
 i. Reached the if statement.
 
-j. I DON'T KNOW
+j. layout asm in gdb debugger to go into assembly code
 
-k. I DON'T KNOW
+k. Repeatedly call ni to skip to next callq instruction. 
 
-l. I DON'T KNOW
+l. What values are in all the registers?
 
-    *
+    * Typing in info registers gives the contents of all the registers.
 
-m. I DON'T KNOW
+(gdb) info registers
+rax            0x2      2
+rbx            0x0      0
+rcx            0x0      0
+rdx            0x0      0
+rsi            0x555555756340   93824994337600
+rdi            0x2      2
+rbp            0x7fffffffe3b0   0x7fffffffe3b0
+rsp            0x7fffffffe390   0x7fffffffe390
+r8             0x0      0
+r9             0x0      0
+r10            0x555555756010   93824994336784
+r11            0x246    582
+r12            0x555555554580   93824992232832
+r13            0x7fffffffe4d0   140737488348368
+r14            0x0      0
+r15            0x0      0
+rip            0x555555554702   0x555555554702 <recur+53>
+eflags         0x202    [ IF ]
+cs             0x33     51
+ss             0x2b     43
+ds             0x0      0
+es             0x0      0
+fs             0x0      0
+gs             0x0      0
 
-n. I DON'T KNOW
 
-o.
+m. Use the command ni to step into the call instruction
 
-p.
+n. Go back to c using layout prev
 
-q.
+o. We can get the call stack by calling backtrace in gdb. 
 
-r.
+(gdb) backtrace
+#0  recur (i=21845) at recurse.c:3
+#1  0x0000555555554707 in recur (i=3) at recurse.c:9
+#2  0x00005555555546c6 in main (argc=1, argv=0x7fffffffe4d8) at map.c:23
 
-s.
+p. break recur if i == 0
+
+// break x:20 if strcmp(y, "hello") == 0
+
+q. continue
+
+r. We can print out the call stack by calling backtrace
+
+(gdb) backtrace
+#0  recur (i=0) at recurse.c:5
+#1  0x0000555555554707 in recur (i=1) at recurse.c:9
+#2  0x0000555555554707 in recur (i=2) at recurse.c:9
+#3  0x0000555555554707 in recur (i=3) at recurse.c:9
+#4  0x00005555555546c6 in main (argc=1, argv=0x7fffffffe4d8) at map.c:23
+
+s. 
 
 t.
 
-u.
+u. layout asm
 
 v.
 
     *
 
-w.
+w. layout prev
 
 x.
 
-y.
+y. run
 
-z.
+z. quit

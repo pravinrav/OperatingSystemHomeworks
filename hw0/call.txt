@@ -1,10 +1,15 @@
-1.
+1. To generate recurse.s, we can run:
 
-2.
+gcc -m32 -S -o recurse.s recurse.c
 
-3.
+2. The .text segment of the object file contains the machine code that corresponds to the primary instructions of the program. The .text segment contains executable code.
 
-4
+The .data segment of the object file contains the stored pre-initialized data that is used by the program. 
+
+3. objdump -D map.obj --syms is the command used to view the symbols in an ELF file. One can get 
+the symbol table of an object file by appending --syms.
+
+4. g means global. O refers to an object. F refers to function. *UND* refers to undefined symbols. 
 
 5.
 
@@ -12,7 +17,4 @@
 
 7.
 
-8.
-
-9.
 
