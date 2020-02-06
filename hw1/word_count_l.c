@@ -28,27 +28,51 @@
 
 void init_words(word_count_list_t *wclist) {
   /* TODO */
-  //struct list foo_list;
-  //list_init (&foo_list);
+  // wclist is a pointer to a word_count_list_t object - pointer to a struct list
+  // word_count_list_t is a struct list
 
-  struct list birthdate_list;
-  list_init (&birthdate_list);
+  list_init(wclist);
+
+  // struct list birthdate_list;
+  // list_init (&birthdate_list);
 }
 
 size_t len_words(word_count_list_t *wclist) {
   /* TODO */
-  return 0;
+  return list_size(wclist);
 }
 
 word_count_t *find_word(word_count_list_t *wclist, char *word) {
   /* TODO */
+  struct list_elem *e;
+  for (e = list_begin(wclist); e != list_end(wclist); e = list_next(e)) {
+
+    // word_count_t * wc = (word_count_t *) malloc(sizeof(word_count_t));
+    word_count_t * wc = list_entry(e, word_count_t, elem);
+
+    if (strcmp(wc->word, word) == 0) {
+      return wc; 
+    }
+  }
   return NULL;
 }
 
 word_count_t *add_word_with_count(word_count_list_t *wclist, char *word,
                                   int count) {
   /* TODO */
-  return NULL;
+  word_count_t * node = find_word(wclist, word);
+  if (node != NULL) {
+    node->count = node->count + 1;
+  } else {
+
+    // Allocate space for the new word
+    word_count_t * newNode = (word_count_t *) malloc(sizeof(word_count_t));
+
+    newNode->word = new_string(word);
+    newNode->count = 1;
+
+    list_push_front(wclist, &newNode->elem);
+  }
 }
 
 word_count_t *add_word(word_count_list_t *wclist, char *word) {
@@ -56,7 +80,11 @@ word_count_t *add_word(word_count_list_t *wclist, char *word) {
 }
 
 void fprint_words(word_count_list_t *wclist, FILE *outfile) {
-  /* TODO */
+  struct list_elem *e;
+  for (e = list_begin(wclist); e != list_end(wclist); e = list_next(e)) {
+    word_count_t * wc = list_entry(e, word_count_t, elem);
+    fprintf(outfile, "%8d\t%s\n", wc->count, wc->word);
+  }
 }
 
 static bool less_list(const struct list_elem *ewc1,
