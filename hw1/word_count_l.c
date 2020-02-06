@@ -97,7 +97,11 @@ void fprint_words(word_count_list_t *wclist, FILE *outfile) {
 static bool less_list(const struct list_elem *ewc1,
                       const struct list_elem *ewc2, void *aux) {
   /* TODO */
-  return false;
+  bool (*functPtr)(word_count_t *, word_count_t *) = aux;
+
+  // void (*fun_ptr)(int) = aux; 
+
+  return (*functPtr)(list_entry(ewc1, word_count_t, elem), list_entry(ewc2, word_count_t, elem));
 }
 
 void wordcount_sort(word_count_list_t *wclist,
