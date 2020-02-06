@@ -26,6 +26,10 @@
 
 #include "word_count.h"
 
+char *new_string(char *str) {
+  return strcpy((char *)malloc(strlen(str)+1), str);
+}
+
 void init_words(word_count_list_t *wclist) {
   /* TODO */
   // wclist is a pointer to a word_count_list_t object - pointer to a struct list
@@ -63,6 +67,7 @@ word_count_t *add_word_with_count(word_count_list_t *wclist, char *word,
   word_count_t * node = find_word(wclist, word);
   if (node != NULL) {
     node->count = node->count + 1;
+    return node;
   } else {
 
     // Allocate space for the new word
@@ -72,6 +77,8 @@ word_count_t *add_word_with_count(word_count_list_t *wclist, char *word,
     newNode->count = 1;
 
     list_push_front(wclist, &newNode->elem);
+
+    return newNode;
   }
 }
 
