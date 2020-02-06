@@ -28,6 +28,11 @@
 
 void init_words(word_count_list_t *wclist) {
   /* TODO */
+  //struct list foo_list;
+  //list_init (&foo_list);
+
+  struct list birthdate_list;
+  list_init (&birthdate_list);
 }
 
 size_t len_words(word_count_list_t *wclist) {
