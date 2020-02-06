@@ -81,7 +81,7 @@ word_count_t *add_word_with_count(word_count_list_t *wclist, char *word,
     return newNode;
   }
 }
-
+// blah blah
 word_count_t *add_word(word_count_list_t *wclist, char *word) {
   return add_word_with_count(wclist, word, 1);
 }
