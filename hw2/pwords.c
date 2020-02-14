@@ -55,28 +55,35 @@ int main(int argc, char *argv[]) {
   //printf("hello ever");
 
   void *threadfun(void *threadid) {
+
       char * dataFileName = (char * ) threadid; 
       // struct Data * datastruct = (struct Data *) threadid;  
       printf("%s\n", dataFileName);
 
-      FILE *infile = fopen(dataFileName, "r");
-      //word_count_list_t word_counts = word_counts;
-
-      count_words(&word_counts, infile);
-      fclose(infile);
+      if (strcmp(dataFileName, "stdin") == 0) {
+        count_words(&word_counts, stdin);
+      }
+      else {
+        FILE *infile = fopen(dataFileName, "r");
+        //word_count_list_t word_counts = word_counts;
+        count_words(&word_counts, infile);
+        fclose(infile);
+      }
 
       pthread_exit(NULL);
   }
 
 
+  pthread_t threads[argc];
+
   if (argc <= 1) {
     /* Process stdin in a single thread. */
-    count_words(&word_counts, stdin);
+    pthread_create(&threads[0], NULL, threadfun, (void *) "stdin");
+    // count_words(&word_counts, stdin);
+    pthread_join(threads[0], NULL);
   } else {
     /* TODO */
     int i;
-    pthread_t threads[argc];
-
     // struct Data datastruct;
 
     for (i = 1; i < argc; i++) {
