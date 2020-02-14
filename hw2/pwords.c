@@ -35,30 +35,39 @@
 struct Data {
   char * string;
   word_count_list_t word_counts;
-} data;
+};
 
 
-void *threadfun(void *threadid) {
 
-  struct Data * datastruct = (struct Data *) threadid;  
-
-  FILE *infile = fopen(datastruct->string, "r");
-  word_count_list_t word_counts = datastruct->word_counts;
-
-  count_words(&word_counts, infile);
-  fclose(infile);
-
-  pthread_exit(NULL);
-}
 
 
 /*
  * main - handle command line, spawning one thread per file.
  */
 int main(int argc, char *argv[]) {
+
+  
+
+
   /* Create the empty data structure. */
   word_count_list_t word_counts;
   init_words(&word_counts);
+  //printf("hello ever");
+
+  void *threadfun(void *threadid) {
+      char * dataFileName = (char * ) threadid; 
+      // struct Data * datastruct = (struct Data *) threadid;  
+      printf("%s\n", dataFileName);
+
+      FILE *infile = fopen(dataFileName, "r");
+      //word_count_list_t word_counts = word_counts;
+
+      count_words(&word_counts, infile);
+      fclose(infile);
+
+      pthread_exit(NULL);
+  }
+
 
   if (argc <= 1) {
     /* Process stdin in a single thread. */
@@ -68,13 +77,17 @@ int main(int argc, char *argv[]) {
     int i;
     pthread_t threads[argc];
 
+    // struct Data datastruct;
+
     for (i = 1; i < argc; i++) {
 
-      data.string = argv[i];
-      // data.infile = fopen(argv[i], "r");
-      data.word_counts = word_counts;
+      //datastruct.string = strcpy(malloc(100), argv[i]);
+      //printf("%s", datastruct.string);
 
-      int rc = pthread_create(&threads[i], NULL, threadfun, (void *) &data);
+      // data.infile = fopen(argv[i], "r");
+      //datastruct.word_counts = word_counts;
+
+      int rc = pthread_create(&threads[i - 1], NULL, threadfun, (void *) argv[i]);
 
 
       if (rc) {
@@ -85,8 +98,9 @@ int main(int argc, char *argv[]) {
     }
 
     for (int j = 1; j < argc; j++) {
-      pthread_join(threads[j], NULL);
+      pthread_join(threads[j - 1], NULL);
     }
+
 
   }
 
