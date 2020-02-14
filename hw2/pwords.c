@@ -32,10 +32,10 @@
 #include "word_count.h"
 #include "word_helpers.h"
 
-struct Data {
-  char * string;
-  word_count_list_t word_counts;
-};
+// struct Data {
+//   char * string;
+//   word_count_list_t word_counts;
+// };
 
 
 
@@ -58,9 +58,10 @@ int main(int argc, char *argv[]) {
 
       char * dataFileName = (char * ) threadid; 
       // struct Data * datastruct = (struct Data *) threadid;  
-      printf("%s\n", dataFileName);
+      //printf("%s\n", dataFileName);
 
       if (strcmp(dataFileName, "stdin") == 0) {
+        //printf("Here");
         count_words(&word_counts, stdin);
       }
       else {
@@ -98,7 +99,7 @@ int main(int argc, char *argv[]) {
 
 
       if (rc) {
-        printf("ERROR; return code from pthread_create() is %d\n", rc);
+        //printf("ERROR; return code from pthread_create() is %d\n", rc);
         exit(-1);
       }
 
