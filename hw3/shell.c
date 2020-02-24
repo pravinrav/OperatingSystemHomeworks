@@ -16,6 +16,9 @@
 /* Convenience macro to silence compiler warnings about unused function parameters. */
 #define unused __attribute__((unused))
 
+FILE * input; 
+FILE * output;
+
 /* Whether the shell is connected to an actual terminal or not. */
 bool shell_is_interactive;
 
@@ -88,6 +91,52 @@ int lookup(char cmd[]) {
   return -1;
 }
 
+char * substringSearch(char * bigPath, char* littlePath) {
+  size_t len = strlen(bigPath);
+  if (len == 0) {
+    return NULL;
+  }
+  int length = 0;
+  while (length < len) {
+    if (bigPath[length] != ':') {
+      length++;
+    }
+  }
+
+  char * allocated = malloc(sizeof(char) * (length + 2 + strlen(littlePath)));
+  strncpy(allocated, bigPath, length);
+  strcat(allocated, "/"); 
+  strcat(allocated, littlePath);
+
+  int filePresent;
+
+  filePresent = access(allocated, F_OK);
+  if (filePresent != -1) {
+    return allocated;
+  }
+
+  return substringSearch(bigPath + length + 1, littlePath);
+
+}
+  
+
+
+
+char * getProperPath(char * command) {
+  char * currentPath = getenv("PATH");
+  char * allocatedCMD = malloc(4096); 
+  if (command[0] == '.') {
+    allocatedCMD = realpath(command, allocatedCMD);
+    int filePresent = access(allocatedCMD, -1);
+    if (filePresent != 1) {
+      return allocatedCMD;
+    } else {
+      return NULL;
+    } 
+  }
+  return substringSearch(currentPath, command);
+}
+
 /* Intialization procedures for this shell */
 void init_shell() {
   /* Our shell is connected to standard input. */
@@ -124,6 +173,9 @@ int main(unused int argc, unused char *argv[]) {
   if (shell_is_interactive)
     fprintf(stdout, "%d: ", line_num);
 
+  input = stdin; 
+  output = stdout;
+
   while (fgets(line, 4096, stdin)) {
     /* Split our line into words. */
     struct tokens *tokens = tokenize(line);
@@ -132,10 +184,105 @@ int main(unused int argc, unused char *argv[]) {
     int fundex = lookup(tokens_get_token(tokens, 0));
 
     if (fundex >= 0) {
+
+      int counter = 0;
+      size_t lengthTokens = tokens_get_length(tokens);
+
+      for (int k = 0; k < lengthTokens; k++) {
+        char * token = tokens_get_token(tokens, k);
+
+        if (token[0] == '<') {
+          k++;
+          char * file = tokens_get_token(tokens, k);
+          input = fopen(file, "r");
+
+          fgets(line, 4096, input);
+          tokens = tokenize(line);
+
+          counter = counter + 1;
+        }
+
+        if (token[0] == '>') {
+          k++;
+          char * file = tokens_get_token(tokens, k);
+
+          output = fopen(file, "w");
+
+          counter = counter + 2;
+        }
+
+      }
+
       cmd_table[fundex].fun(tokens);
+
+      if (counter & 1 != 0) {
+        fclose(input);
+        input = stdin;
+      } else if (counter & 2 == 0) {
+        fclose(output);
+        output = stdout;
+      }
+
+
     } else {
       /* REPLACE this to run commands as programs. */
-      fprintf(stdout, "This shell doesn't know how to run programs.\n");
+      // COMMENT: fprintf(stdout, "This shell doesn't know how to run programs.\n");
+      size_t tokenLength = tokens_get_length(tokens);
+
+      char * programName = tokens_get_token(tokens, 0);
+      char * programPath = getProperPath(programName);
+      if (programPath == NULL) {
+        printf("no program named this");
+      } else {
+        int status;
+        pid_t process = fork();
+
+        if (process == 0) { // If we are in the child process
+          setpgid(getpid(), getpid()); 
+          int counter = 0;
+
+          char * parameterList[tokenLength + 1];
+          int index = 0;
+
+          for (int j = 0; j < tokenLength; j++) {
+            char * token = tokens_get_token(tokens, j);
+            if (token[0] == '<') {
+              j++;
+              char * file = tokens_get_token(tokens, j);
+              freopen(file, "r", stdin);
+              counter = counter + 1;
+            }
+            else if (token[0] == '<') {
+              j++;
+              char * file = tokens_get_token(tokens, j);
+              freopen(file, "w", stdout);
+              counter = counter + 2;
+            }
+            else {
+              parameterList[index++] = tokens_get_token(tokens, j);
+            }
+          }
+
+          parameterList[index] = NULL;
+          execv(programPath, parameterList); 
+
+          if (counter & 2 != 0) {
+            fclose(stdout);
+          }
+
+          if (counter & 1 != 0) {
+            fclose(stdin);
+          }
+
+          exit(0);
+        }
+
+        if (process > 0) {  // In parent process
+          wait(&status); // wait for child to finish
+        }
+        
+      }
+
     }
 
     if (shell_is_interactive)
