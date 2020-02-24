@@ -47,7 +47,7 @@ fun_desc_t cmd_table[] = {
   {cmd_help, "?", "show this help menu"},
   {cmd_exit, "exit", "exit the command shell"},
   {cmd_cd, "cd", "change the current working directory"}
-  {cmd_pwd, "pwd", "print the current working directory"}f
+  {cmd_pwd, "pwd", "print the current working directory"}
 };
 
 int cmd_pwd(unused struct tokens * tokens) {
