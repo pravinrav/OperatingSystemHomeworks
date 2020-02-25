@@ -84,6 +84,7 @@ int cmd_exit(unused struct tokens *tokens) {
   exit(0);
 }
 
+
 /* Looks up the built-in command, if it exists. */
 int lookup(char cmd[]) {
   for (unsigned int i = 0; i < sizeof(cmd_table) / sizeof(fun_desc_t); i++)
@@ -117,6 +118,11 @@ int locateProgramPath(char * name, char * argList[]) {
   return -1;
 }
 
+void processRedirect(int oldFile, int newFile) {
+  dup2(oldFile, newFile);
+  close(oldFile);
+}
+
 
 int startProgram(struct tokens * tokens) {
 
@@ -148,10 +154,12 @@ int startProgram(struct tokens * tokens) {
       }
 
       else if (redirectInput) {
+        processRedirect(open(token, O_RDONLY), STDIN_FILENO);
         redirectInput = false;
       }
 
       else if (redirectOutput) {
+        processRedirect(creat(token,  S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH), STDIN_FILENO);
         redirectOutput = false;
       }
 
