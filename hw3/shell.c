@@ -163,6 +163,18 @@ int startProgram(struct tokens * tokens) {
         redirectOutput = false;
       }
 
+      else if (strcmp(token, "|") == 0) {
+        char * precedingToken = tokens_get_token(tokens, j - 1);
+        char * followingToken = tokens_get_token(tokens, j + 1);
+
+        int p[2];
+
+        p[0] = open(precedingToken, "r");
+        p[1] = open(followingToken, "w");
+
+        pipe(p);
+      }
+
       else {
         argList[numArgs++] = token;
       }
