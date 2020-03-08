@@ -35,15 +35,20 @@ int server_proxy_port;
  * Serves the contents the file stored at `path` to the client socket `fd`.
  * It is the caller's reponsibility to ensure that the file stored at `path` exists.
  */
-void serve_file(int fd, char *path) {
+void serve_file(int fd, char *path, struct stat *file_stat) {
+
+  char file_size[64];
+  sprintf(file_size, "%lu", file_stat->st_size);
+
+  int readFD = open(path, O_RDONLY);
 
   http_start_response(fd, 200);
   http_send_header(fd, "Content-Type", http_get_mime_type(path));
-  http_send_header(fd, "Content-Length", "0"); // Change this too
+  http_send_header(fd, "Content-Length", file_size); // Change this too
   http_end_headers(fd);
 
   /* TODO: PART 2 */
-
+  send_request_data(fd, readFD);
 }
 
 void serve_directory(int fd, char *path) {
@@ -104,6 +109,17 @@ void handle_files_request(int fd) {
    * determine when to call serve_file() or serve_directory() depending
    * on `path`. Make your edits below here in this function.
    */
+
+  struct stat fileChecking;
+  if (stat(path, &fileChecking) == 0) {
+    if (S_ISREG(fileChecking.st_mode)) {
+
+      serve_file(fd, path, &fileChecking);
+
+    }
+  }
+
+  free(path);
 
   close(fd);
   return;
@@ -241,6 +257,9 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
    * An appropriate size of the backlog is 1024, though you may
    * play around with this value during performance testing.
    */
+  bind(*socket_number, (struct sockaddr *) &server_address, sizeof(server_address));
+  listen(*socket_number, 1024);
+
 
 
   /* PART 1 END */
