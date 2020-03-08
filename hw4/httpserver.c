@@ -31,6 +31,22 @@ char *server_files_directory;
 char *server_proxy_hostname;
 int server_proxy_port;
 
+
+void http_send_data(int clientFD, char * dataString, size_t sizeLeft) {
+  ssize_t bytes;
+
+  while (sizeLeft > 0) {
+    bytes = write(clientFD, dataString, sizeLeft);
+
+    if (bytes < 0) {
+      return;
+    }
+
+    sizeLeft = sizeLeft - bytes;
+    dataString = dataString + bytes;
+  }
+}
+
 /*
  * Serves the contents the file stored at `path` to the client socket `fd`.
  * It is the caller's reponsibility to ensure that the file stored at `path` exists.
@@ -48,7 +64,16 @@ void serve_file(int fd, char *path, struct stat *file_stat) {
   http_end_headers(fd);
 
   /* TODO: PART 2 */
-  send_request_data(fd, readFD);
+  // send_request_data(fd, readFD);
+  char* buffer = (char*) malloc(4097);
+  ssize_t nread;
+
+  while ((nread = read(readFD, buffer, 4096)) > 0) {
+      http_send_data(fd, buffer, nread);
+  }
+  
+  free(buffer);
+
 }
 
 void serve_directory(int fd, char *path) {
