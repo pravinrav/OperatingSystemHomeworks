@@ -32,7 +32,7 @@ char *server_proxy_hostname;
 int server_proxy_port;
 
 
-void http_send_data(int clientFD, char * dataString, size_t sizeLeft) {
+void sendData(int clientFD, char * dataString, size_t sizeLeft) {
   ssize_t bytes;
 
   while (sizeLeft > 0) {
@@ -64,16 +64,14 @@ void serve_file(int fd, char *path, struct stat *file_stat) {
   http_end_headers(fd);
 
   /* TODO: PART 2 */
-  // send_request_data(fd, readFD);
-  char* buffer = (char*) malloc(4097);
+  char * buffer = (char *) malloc(4097);
   ssize_t nread;
 
   while ((nread = read(readFD, buffer, 4096)) > 0) {
-      http_send_data(fd, buffer, nread);
+      sendData(fd, buffer, nread);
   }
-  
-  free(buffer);
 
+  free(buffer);
 }
 
 void serve_directory(int fd, char *path) {
@@ -137,11 +135,32 @@ void handle_files_request(int fd) {
 
   struct stat fileChecking;
   if (stat(path, &fileChecking) == 0) {
-    if (S_ISREG(fileChecking.st_mode)) {
 
+    if (S_ISREG(fileChecking.st_mode)) {
       serve_file(fd, path, &fileChecking);
+    }
+
+    if (S_ISDIR(fileChecking.st_mode)) {
+
+      char * fullName = (char *) malloc(4097);
+      strcpy(fullName, path);
+      strcat(fullName, "index.html");
+
+      int fullFD = open(fullName, O_RDONLY);
+      stat(fullName, &fileChecking);
+
+      if (fullFD != -1) {
+        serve_file(fullFD, path, &fileChecking);
+      }
+
 
     }
+
+
+
+
+
+
   }
 
   free(path);
