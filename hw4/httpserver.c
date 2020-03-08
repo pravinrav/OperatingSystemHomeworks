@@ -83,7 +83,6 @@ void serve_directory(int fd, char *path) {
 
 }
 
-
 /*
  * Reads an HTTP request from client socket (fd), and writes an HTTP response
  * containing:
@@ -142,14 +141,13 @@ void handle_files_request(int fd) {
 
     if (S_ISDIR(fileChecking.st_mode)) {
 
+      // Check if this directory has an index.html in it
       char * fullName = (char *) malloc(4097);
       strcpy(fullName, path);
       strcat(fullName, "index.html");
-
       int fullFD = open(fullName, O_RDONLY);
-      stat(fullName, &fileChecking);
-
       if (fullFD != -1) {
+        stat(fullName, &fileChecking);
         serve_file(fullFD, path, &fileChecking);
       }
 
