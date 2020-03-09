@@ -55,24 +55,24 @@ void sendString(int clientFD, char * dataString) {
  * Serves the contents the file stored at `path` to the client socket `fd`.
  * It is the caller's reponsibility to ensure that the file stored at `path` exists.
  */
-void serve_file(int fd, char *path, struct stat *file_stat) {
+void serve_file(int fd, char *path, struct stat *fileDescription) {
 
-  char file_size[64];
-  sprintf(file_size, "%lu", file_stat->st_size);
+  char size[64];
+  sprintf(size, "%lu", fileDescription->st_size);
 
   int readFD = open(path, O_RDONLY);
 
   http_start_response(fd, 200);
   http_send_header(fd, "Content-Type", http_get_mime_type(path));
-  http_send_header(fd, "Content-Length", file_size); // Change this too
+  http_send_header(fd, "Content-Length", size); // Change this too
   http_end_headers(fd);
 
   /* TODO: PART 2 */
   char * buffer = (char *) malloc(4097);
-  ssize_t nread;
+  ssize_t numRead;
 
-  while ((nread = read(readFD, buffer, 4096)) > 0) {
-      sendData(fd, buffer, nread);
+  while ((numRead = read(readFD, buffer, 4096)) > 0) {
+      sendData(fd, buffer, numRead);
   }
 
   free(buffer);
@@ -86,9 +86,9 @@ void serve_directory(int fd, char *path) {
   http_end_headers(fd);
 
   /* TODO: PART 3 */
-  sendString(fd, "<h2>Index of ");
+  sendString(fd, "<h2> Index of ");
   sendString(fd, path);
-  sendString(fd, " </h2><br>\n");
+  sendString(fd, " </h2> <br>\n");
 
   struct dirent * directoryDesc;
   struct stat fileDescription;
@@ -106,7 +106,10 @@ void serve_directory(int fd, char *path) {
     stat(fullName, &fileDescription);
 
     if (S_ISDIR(fileDescription.st_mode)) {
-      snprintf(entryList, 4096, "<a href='%s/'>%s/</a><br>\n", directoryDesc->d_name, directoryDesc->d_name);
+      snprintf(entryList, 4096, "<a href = '%s/'> %s/ </a><br>\n", directoryDesc->d_name, directoryDesc->d_name);
+    }
+    else {
+      snprintf(entryList, 4096, "<a href = './%s'> %s/ </a><br>\n", directoryDesc->d_name, directoryDesc->d_name);
     }
 
     sendString(fd, entryList);
