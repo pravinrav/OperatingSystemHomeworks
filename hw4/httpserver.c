@@ -201,6 +201,13 @@ void handle_files_request(int fd) {
 
   }
 
+  // File does not exist
+  else {
+    http_start_response(fd, 404);
+    http_send_header(fd, "Content-Type", "text/html");
+    http_end_headers(fd);
+  }
+
   free(path);
 
   close(fd);
