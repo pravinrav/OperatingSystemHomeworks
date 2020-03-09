@@ -47,6 +47,10 @@ void sendData(int clientFD, char * dataString, size_t sizeLeft) {
   }
 }
 
+void sendString(int clientFD, char * dataString) {
+  sendData(clientFD, dataString, strlen(dataString));
+}
+
 /*
  * Serves the contents the file stored at `path` to the client socket `fd`.
  * It is the caller's reponsibility to ensure that the file stored at `path` exists.
@@ -75,11 +79,38 @@ void serve_file(int fd, char *path, struct stat *file_stat) {
 }
 
 void serve_directory(int fd, char *path) {
+  DIR * directory = opendir(path);
+
   http_start_response(fd, 200);
   http_send_header(fd, "Content-Type", http_get_mime_type(".html"));
   http_end_headers(fd);
 
   /* TODO: PART 3 */
+  sendString(fd, "<h2>Index of ");
+  sendString(fd, path);
+  sendString(fd, " </h2><br>\n");
+
+  struct dirent * directoryDesc;
+  struct stat fileDescription;
+  char * fullName = (char *) malloc(4097);
+  char * entryList = (char *) malloc(4097);
+
+  while ( directoryDesc = readdir(directory) ) {
+
+    strcpy(fullName, path);
+    if (fullName[strlen(fullName) - 1] != '/') {
+      strcat(fullName, "/");
+    }
+    strcat(fullName, directoryDesc->d_name);
+
+    stat(fullName, &fileDescription);
+
+    if (S_ISDIR(fileDescription.st_mode)) {
+      snprintf(entryList, 4096, "<a href='%s/'>%s/</a><br>\n", directoryDesc->d_name, directoryDesc->d_name);
+    }
+
+    sendString(fd, entryList);
+  }
 
 }
 
@@ -149,6 +180,13 @@ void handle_files_request(int fd) {
       if (fullFD != -1) {
         stat(fullName, &fileChecking);
         serve_file(fullFD, path, &fileChecking);
+      }
+
+      // Otherwise inspect the directory and print out all the contents
+      else {
+        serve_directory(fd, path);
+
+
       }
 
 
