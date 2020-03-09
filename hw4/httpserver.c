@@ -397,6 +397,16 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
      * connections.
      */
 
+    int pid = fork();
+    if (pid == 0) { // Child process
+      request_handler(client_socket_number);
+      close(client_socket_number);
+      exit(EXIT_SUCCESS);
+    }
+    else if (pid > 0) { // Parent process
+      close(client_socket_number);
+    }
+
     /* PART 5 END */
 #elif THREADSERVER
     /* 
