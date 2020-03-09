@@ -188,16 +188,15 @@ void handle_files_request(int fd) {
       // Otherwise inspect the directory and print out all the contents
       else {
         serve_directory(fd, path);
-
-
       }
-
 
     }
 
-
-
-
+    if (!(S_ISREG(fileChecking.st_mode) || S_ISDIR(fileChecking.st_mode))) {
+      http_start_response(fd, 404);
+      http_send_header(fd, "Content-Type", "text/html");
+      http_end_headers(fd);
+    }
 
 
   }
