@@ -31,6 +31,11 @@ char *server_files_directory;
 char *server_proxy_hostname;
 int server_proxy_port;
 
+struct arg_struct {
+    int fd1;
+    int fd2;
+};
+
 
 void sendData(int clientFD, char * dataString, size_t sizeLeft) {
   ssize_t bytes;
@@ -216,7 +221,12 @@ void handle_files_request(int fd) {
 }
 
 
-void communicateBetweenTwoFDs(int read_fd, int write_fd) {
+void communicateBetweenTwoFDs(void * arg) {
+
+  struct arg_struct * args = (struct arg_struct *) arg;
+
+  int read_fd =  args->fd1; 
+  int write_fd =  args->fd2;
 
   //while (1) { 
     char buffer[1024 * 1024];
@@ -309,10 +319,7 @@ void handle_proxy_request(int fd) {
   }
 
   /* TODO: PART 4 */
-  struct arg_struct {
-    int fd1;
-    int fd2;
-  };
+  
   struct arg_struct args;
 
   args.fd1 = target_fd;
