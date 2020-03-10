@@ -225,7 +225,7 @@ void communicateBetweenTwoFDs(int read_fd, int write_fd) {
     int buf_size = 0;
     //while ((bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size)) > 0) {
 
-    bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size)
+    bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size);
       
       write(write_fd, &buffer[buf_size], bytes_read);
 
