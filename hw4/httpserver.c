@@ -324,7 +324,8 @@ void *handle_clients(void *void_request_handler) {
   pthread_detach(pthread_self());
 
   /* TODO: PART 7 */
-
+  int nextClientSocket = wq_pop(&work_queue);
+  request_handler(nextClientSocket);
 }
 
 /* 
@@ -333,6 +334,13 @@ void *handle_clients(void *void_request_handler) {
 void init_thread_pool(int num_threads, void (*request_handler)(int)) {
 
   /* TODO: PART 7 */
+  pthread_t threads[num_threads];
+
+  for(int t = 0; t < num_threads; t++) {
+    int rc = pthread_create(&threads[t], NULL, handle_clients, (void *) request_handler);
+  }
+
+  wq_init(&work_queue);
 
 }
 #endif
@@ -461,7 +469,7 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
      * client's socket number to the work queue. A thread
      * in the thread pool will send a response to the client.
      */
-
+    wq_push(&work_queue, client_socket_number);
 
 
     /* PART 7 END */
