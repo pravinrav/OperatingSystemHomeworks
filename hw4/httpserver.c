@@ -236,13 +236,19 @@ void communicateBetweenTwoFDs(void * arg) {
     //while ((bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size)) > 0) {
 
     bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size);
+
+    if (bytes_read <= 0) {
+      break;
+    }
       
       write(write_fd, &buffer[buf_size], bytes_read);
 
       buf_size += bytes_read;
     //}
 
-    break;
+
+
+    //break;
     /*
     int bytes_written = 0;
     //int write_fd = open(dest, O_WRONLY);
