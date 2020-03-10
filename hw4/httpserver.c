@@ -324,8 +324,11 @@ void *handle_clients(void *void_request_handler) {
   pthread_detach(pthread_self());
 
   /* TODO: PART 7 */
-  int nextClientSocket = wq_pop(&work_queue);
-  request_handler(nextClientSocket);
+  while (true) {
+    int nextClientSocket = wq_pop(&work_queue);
+    request_handler(nextClientSocket);
+  }
+  
 }
 
 /* 
