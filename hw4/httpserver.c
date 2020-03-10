@@ -218,7 +218,7 @@ void handle_files_request(int fd) {
 
 void communicateBetweenTwoFDs(int read_fd, int write_fd) {
 
-  while (1) { 
+  //while (1) { 
     char buffer[1024 * 1024];
 
     int bytes_read = 0;
@@ -232,7 +232,7 @@ void communicateBetweenTwoFDs(int read_fd, int write_fd) {
       buf_size += bytes_read;
     //}
 
-    break;
+    //break;
     /*
     int bytes_written = 0;
     //int write_fd = open(dest, O_WRONLY);
@@ -240,7 +240,7 @@ void communicateBetweenTwoFDs(int read_fd, int write_fd) {
       bytes_written += write(write_fd, &buffer[bytes_written], buf_size - bytes_written);
     }
     */
-  }
+  //}
   
 }
 
