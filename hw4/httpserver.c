@@ -353,13 +353,15 @@ void *handle_clients(void *void_request_handler) {
 void init_thread_pool(int num_threads, void (*request_handler)(int)) {
 
   /* TODO: PART 7 */
+  wq_init(&work_queue);
+
   pthread_t threads[num_threads];
 
   for(int t = 0; t < num_threads; t++) {
     int rc = pthread_create(&threads[t], NULL, handle_clients, (void *) request_handler);
   }
 
-  wq_init(&work_queue);
+  
 
 }
 #endif
