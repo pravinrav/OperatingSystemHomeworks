@@ -228,21 +228,21 @@ void communicateBetweenTwoFDs(void * arg) {
   int read_fd =  args->fd1; 
   int write_fd =  args->fd2;
 
-  //while (1) { 
+  while (1) { 
     char buffer[1024 * 1024];
 
     int bytes_read = 0;
     int buf_size = 0;
-    //while ((bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size)) > 0) {
+    while ((bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size)) > 0) {
 
-    bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size);
+    //bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size);
       
       write(write_fd, &buffer[buf_size], bytes_read);
 
       buf_size += bytes_read;
-    //}
+    }
 
-    //break;
+    break;
     /*
     int bytes_written = 0;
     //int write_fd = open(dest, O_WRONLY);
@@ -250,7 +250,7 @@ void communicateBetweenTwoFDs(void * arg) {
       bytes_written += write(write_fd, &buffer[bytes_written], buf_size - bytes_written);
     }
     */
-  //}
+  }
   
 }
 
