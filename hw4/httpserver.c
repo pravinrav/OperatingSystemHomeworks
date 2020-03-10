@@ -219,22 +219,25 @@ void handle_files_request(int fd) {
 void communicateBetweenTwoFDs(int read_fd, int write_fd) {
 
   while (1) { 
-    char buffer[1024];
+    char buffer[1024 * 1024];
 
     int bytes_read = 0;
     int buf_size = 0;
     while ((bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size)) > 0) {
-      if (bytes_read <= 0) {
-        break;
-      }
+      
+      write(write_fd, &buffer[buf_size], bytes_read);
+
       buf_size += bytes_read;
     }
-    
+
+    break;
+    /*
     int bytes_written = 0;
     //int write_fd = open(dest, O_WRONLY);
     while (bytes_written < buf_size) {
       bytes_written += write(write_fd, &buffer[bytes_written], buf_size - bytes_written);
     }
+    */
   }
   
 }
@@ -304,9 +307,22 @@ void handle_proxy_request(int fd) {
   }
 
   /* TODO: PART 4 */
+  struct arg_struct {
+    int fd1;
+    int fd2;
+  };
+  struct arg_struct args;
+
+  args.fd1 = target_fd;
+  args.fd2 = fd;
+  pthread_t newThreadProxyToClient; 
+  pthread_create(&newThreadProxyToClient, NULL, communicateBetweenTwoFDs, &args); 
 
 
-
+  args.fd1 = fd;
+  args.fd2 = target_fd;
+  pthread_t newThreadClientToProxy; 
+  pthread_create(&newThreadClientToProxy, NULL, communicateBetweenTwoFDs, &args); 
 
 }
 
