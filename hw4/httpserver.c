@@ -177,12 +177,13 @@ void handle_files_request(int fd) {
 
       // Check if this directory has an index.html in it
       char * fullName = (char *) malloc(4097);
-      strcpy(fullName, path);
+      // strcpy(fullName, server_files_directory);
+      strcpy(fullName, "");
       strcat(fullName, "index.html");
       int fullFD = open(fullName, O_RDONLY);
       if (fullFD != -1) {
         stat(fullName, &fileChecking);
-        serve_file(fullFD, path, &fileChecking);
+        serve_file(fd, fullName, &fileChecking);
       }
 
       // Otherwise inspect the directory and print out all the contents
@@ -213,6 +214,32 @@ void handle_files_request(int fd) {
   close(fd);
   return;
 }
+
+
+void communicateBetweenTwoFDs(int read_fd, int write_fd) {
+
+  while (1) { 
+    char buffer[1024];
+
+    int bytes_read = 0;
+    int buf_size = 0;
+    while ((bytes_read = read(read_fd, &buffer[buf_size], sizeof(buffer) - buf_size)) > 0) {
+      if (bytes_read <= 0) {
+        break;
+      }
+      buf_size += bytes_read;
+    }
+    
+    int bytes_written = 0;
+    int write_fd = open(dest, O_WRONLY);
+    while (bytes_written < buf_size) {
+      bytes_written += write(write_fd, &buffer[bytes_written], buf_size - bytes_written);
+    }
+  }
+  
+}
+
+
 
 /*
  * Opens a connection to the proxy target (hostname=server_proxy_hostname and
@@ -277,6 +304,9 @@ void handle_proxy_request(int fd) {
   }
 
   /* TODO: PART 4 */
+
+
+
 
 }
 
@@ -419,6 +449,9 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
      * thread will NOT be joining with the new thread.
      */
 
+    pthread_t newThreadForConnection; 
+    pthread_create(&newThreadForConnection, NULL, request_handler, client_socket_number); 
+
     /* PART 6 END */
 #elif POOLSERVER
     /* 
@@ -428,6 +461,8 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
      * client's socket number to the work queue. A thread
      * in the thread pool will send a response to the client.
      */
+
+
 
     /* PART 7 END */
 #endif
