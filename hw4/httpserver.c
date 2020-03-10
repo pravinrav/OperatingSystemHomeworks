@@ -324,8 +324,8 @@ void handle_proxy_request(int fd) {
   pthread_t newThreadClientToProxy; 
   pthread_create(&newThreadClientToProxy, NULL, communicateBetweenTwoFDs, &args); 
 
-  pthread_join(newThreadClientToProxy);
-  pthread_join(newThreadProxyToClient); 
+  pthread_join(newThreadClientToProxy, NULL);
+  pthread_join(newThreadProxyToClient, NULL); 
 
 }
 
