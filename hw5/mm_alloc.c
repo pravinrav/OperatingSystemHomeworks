@@ -134,10 +134,13 @@ void coalesceBlock(struct block * currBlock) {
         if (currBlock->next) {
             currBlock->next->previous = currBlock->previous;
         }
+
+        struct block * previousBlock = currBlock->next;
+        void * ptr = previousBlock + sizeof(struct block);
+        bzero(ptr, previousBlock->size);
     }
 
-    void * ptr = currBlock + sizeof(struct block);
-    bzero(ptr, currBlock->size);
+    
 }
 
 
