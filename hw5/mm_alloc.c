@@ -15,10 +15,11 @@ struct block {
 
 	size_t size;
 	int free;
-}
+};
 
 static struct block head;
-static struct block tail;
+
+
 
 static void checkValidMallocPointer(void * ptr) {
 	struct block * b = head.next;
@@ -29,7 +30,6 @@ static void checkValidMallocPointer(void * ptr) {
 		}
 		b = b->next;
 	}
-
 }
 
 struct block * findFreeBlock(size_t size) {
@@ -62,9 +62,9 @@ void* mm_malloc(size_t size)
   if (freeBlock == NULL) return NULL;
 
   // Check if we have to partition the block
-  if (block->size > 2 * sizeof(struct block) + size) {
+  if (freeBlock->size > 2 * sizeof(struct block) + size) {
   	struct block * new = (struct block *) freeBlock + size + sizeof(struct block);
-  	new->prev = freeBlock;
+  	new->previous = freeBlock;
   	new->next = freeBlock->next;
 
   	new->size = freeBlock->size - sizeof(struct block) - size;
@@ -83,13 +83,21 @@ void* mm_malloc(size_t size)
   if (beginningOfMemory) return beginningOfMemory;
 
   struct block * tail = (struct block *) sbrk(0);
-  sbrk(sizeof(struct block) + size)
+  sbrk(sizeof(struct block) + size);
 
-  // edit
+  tail->size = size; 
+  tail->free = 0; 
 
+  static struct block * tailEnd = &head;
+  tailEnd->next = tail;
+  tail->previous = tailEnd;
+  tail->next = NULL;
+  tailEnd = tail;
 
+  void * ptr = (void *) (sizeof(struct block) + tail);
+  bzero(ptr, size);
 
-  return NULL;
+  return ptr;
 }
 
 void* mm_realloc(void* ptr, size_t size)
