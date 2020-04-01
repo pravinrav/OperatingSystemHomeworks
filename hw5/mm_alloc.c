@@ -17,17 +17,17 @@ struct block {
     int free;
 };
 
-struct block head;
+struct block * head = NULL;
 
 
 struct block * findFreeBlock(size_t size) {
     
     // Search list for block that is large enough to fit the size
-    struct block * b = &head;
+    struct block * b = head;
     while (b != NULL) {
 
         if (b->free) {
-            if (b->size > sizeof(struct block) + size) {
+            if (b->size > size) {
                 return b;
             }
         }
@@ -76,17 +76,32 @@ void *mm_malloc(size_t size) {
     }
 
     struct block * currentEnd = (struct block *) sbrk(0);
-    sbrk(sizeof(struct block) + size);
+
+    void * value = sbrk(sizeof(struct block) + size);
+    if (value == (void *) -1) {
+        return NULL; 
+    }
 
     currentEnd->size = size; 
     currentEnd->free = 0; 
 
     // insert the struct block into the linked list
-    struct block * tailEnd = &head;
-    tailEnd->next = currentEnd;
-    currentEnd->previous = tailEnd;
-    currentEnd->next = NULL;
-    tailEnd = currentEnd;
+    if (head == NULL) {
+        head = currentEnd;
+    } 
+    else {
+
+        // iterate through the memory linked list to find the last element
+        struct block * b = head;
+        while (b->next != NULL) {
+            b = b->next;
+        }
+
+        b->next = currentEnd;
+        currentEnd->previous = b;
+        currentEnd->next = NULL;
+
+    }
 
     mallocPtr = (void *) (sizeof(struct block) + currentEnd);
     bzero(mallocPtr, size);
@@ -98,51 +113,58 @@ void *mm_realloc(void *ptr, size_t size) {
     return NULL;
 }
 
-static void checkValidMallocPointer(void * ptr) {
-    struct block * b = head.next;
+static int checkValidMallocPointer(void * ptr) {
+    struct block * b = head->next;
     while (b != NULL) {
         void * start = (void *) b + sizeof(struct block);
         if (start == ptr) {
-            return;
+            return 1;
         }
         b = b->next;
     }
+    return 0;
 }
+
+void coalesceBlock(struct block * currBlock) {
+
+    if (currBlock->previous && currBlock->previous->free == 1) {
+        currBlock->previous->next = currBlock->next;
+        currBlock->previous->size += currBlock->size + sizeof(struct block);
+
+        if (currBlock->next) {
+            currBlock->next->previous = currBlock->previous;
+        }
+    }
+
+    void * ptr = currBlock + sizeof(struct block);
+    bzero(ptr, currBlock->size);
+}
+
 
 void mm_free(void *ptr) {
     if (ptr == NULL) {
         return;
     }
-    checkValidMallocPointer(ptr);
-
-    struct block * currBlock = (struct block *) (ptr - sizeof(struct block));
-    currBlock->free = 1; 
-
-    struct block * nextBlock = currBlock->next;
-
-    while ((nextBlock != NULL) && (nextBlock->free == 1)) {
-
-        if (nextBlock->next == 0) {
-            currBlock->next = NULL;
-            currBlock->size = sbrk(0) - sizeof(struct block) - (void *) currBlock;
-        }
-
-        else {
-            currBlock->size = nextBlock->next - sizeof(struct block) - currBlock;
-            currBlock->next = nextBlock->next;
-
-            nextBlock->previous = currBlock;
-        }
-
-        nextBlock = currBlock->next;
+    int val = checkValidMallocPointer(ptr);
+    if (val == 0) {
+        return;
     }
 
-    if (currBlock->previous && currBlock->previous->free == 1) {
-        currBlock->previous->next = nextBlock;
-        currBlock->previous->size += currBlock->size + (void *) currBlock - (void *) currBlock->previous;
-        if (nextBlock) {
-            nextBlock->previous = currBlock->previous;
-        }
+    // Get the current block and set it all equal to 0s
+    struct block * currBlock = (struct block *) (ptr - sizeof(struct block));
+    currBlock->free = 1; 
+    bzero(ptr, currBlock->size);
+
+    // Get the next block for coalescing
+    struct block * nextBlock = currBlock->next;
+
+    // Check the previous block and the next block 
+    struct block * previousBlock = currBlock->previous;
+    if (previousBlock != NULL && previousBlock->free == 1) {
+        coalesceBlock(currBlock);
+    }
+    if (nextBlock != NULL && nextBlock->free == 1) {
+        coalesceBlock(nextBlock); 
     }
 
 }
