@@ -38,7 +38,7 @@ struct block * findFreeBlock(size_t size) {
 	struct block * b = &head;
 	while (b != NULL) {
 
-		if (b->free == 1) {
+		if (b->free) {
 			if (b->size > sizeof(struct block) + size) {
 				return b;
 			}
