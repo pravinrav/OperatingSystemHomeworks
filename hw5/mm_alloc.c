@@ -137,14 +137,12 @@ void mm_free(void *ptr) {
         nextBlock = currBlock->next;
     }
 
-    if (currBlock->previous->free == 1) {
+    if (currBlock->previous && currBlock->previous->free == 1) {
         currBlock->previous->next = nextBlock;
         currBlock->previous->size += currBlock->size + (void *) currBlock - (void *) currBlock->previous;
         if (nextBlock) {
             nextBlock->previous = currBlock->previous;
         }
     }
-
-
 
 }
