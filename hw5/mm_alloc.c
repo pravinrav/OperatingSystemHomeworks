@@ -114,7 +114,7 @@ void *mm_realloc(void *ptr, size_t size) {
 }
 
 static int checkValidMallocPointer(void * ptr) {
-    struct block * b = head->next;
+    struct block * b = head;
     while (b != NULL) {
         void * start = (void *) b + sizeof(struct block);
         if (start == ptr) {
