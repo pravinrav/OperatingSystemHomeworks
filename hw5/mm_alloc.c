@@ -114,9 +114,6 @@ void *mm_malloc(size_t size) {
     return mallocPtr;
 }
 
-void *mm_realloc(void *ptr, size_t size) {
-    return NULL;
-}
 
 static int checkValidMallocPointer(void * ptr) {
     struct block * b = head;
@@ -129,6 +126,44 @@ static int checkValidMallocPointer(void * ptr) {
     }
     return 0;
 }
+
+void *mm_realloc(void *ptr, size_t size) {
+    if (ptr == NULL && size != 0) {
+        return mm_malloc(size);
+    }
+    if (size == 0 && ptr != NULL) {
+        mm_free(ptr);
+        return NULL;
+    }
+
+    checkValidMallocPointer(ptr);
+
+    struct block * currBlock = (struct block *) (ptr - sizeof(struct block));
+    struct block * nextBlock = currBlock->next;
+
+    // Is the currBlock large enough to handle the new size?
+    if (size < ( (void *) nextBlock - (void *) currBlock - sizeof(struct block) ) ) {
+        currBlock->size = size;
+
+        return ptr;
+    }
+
+    // Otherwise allocate a new block with the new size 
+    struct block * newBlock = mm_malloc(size);
+    if (newBlock == NULL) {
+        return NULL;
+    }
+
+    // Copy over data to this new block
+    void * pointer = (void *) newBlock;
+    memcpy(pointer + sizeof(struct block), ptr, currBlock->size);
+
+    // Free the original pointer at the end
+    mm_free(ptr);
+
+    return newBlock;
+}
+
 
 void coalesceBlock(struct block * currBlock) {
 
