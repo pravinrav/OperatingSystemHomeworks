@@ -135,6 +135,9 @@ void *mm_realloc(void *ptr, size_t size) {
         mm_free(ptr);
         return NULL;
     }
+    if (ptr == NULL && size == 0) {
+        return NULL;
+    }
 
     checkValidMallocPointer(ptr);
 
@@ -154,9 +157,12 @@ void *mm_realloc(void *ptr, size_t size) {
         return NULL;
     }
 
+    // Zero fill this new block with 0s
+    void * startPtr = (void *) (sizeof(struct block) + newBlock);
+    bzero(startPtr, size);
+
     // Copy over data to this new block
-    void * pointer = (void *) newBlock;
-    memcpy(pointer + sizeof(struct block), ptr, currBlock->size);
+    memcpy(startPtr, ptr, currBlock->size);
 
     // Free the original pointer at the end
     mm_free(ptr);
