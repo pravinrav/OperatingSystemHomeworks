@@ -55,6 +55,11 @@ static void * findMallocBlock(size_t size) {
     freeBlock->size = size;
     freeBlock->next = new;
     freeBlock->free = 0;
+
+    if (freeBlock->next) {
+        freeBlock->next->previous = new; 
+    }
+
   } else { // We don't have to partition the block
     freeBlock->size = size;
     freeBlock->free = 0;
