@@ -147,8 +147,8 @@ void *mm_realloc(void *ptr, size_t size) {
     // Is the currBlock large enough to handle the new size?
     if (size < ( (void *) nextBlock - (void *) currBlock - sizeof(struct block) ) ) {
 
-        void * start = (void *) (currBlock + size);
-        bzero(start, currBlock->size - size);
+        // void * start = (void *) (currBlock + size);
+        // bzero(start, currBlock->size - size);
 
         currBlock->size = size;
 
