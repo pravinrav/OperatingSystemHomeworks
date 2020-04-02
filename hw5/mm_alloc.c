@@ -44,7 +44,7 @@ static void * findMallocBlock(size_t size) {
   if (freeBlock == NULL) return NULL;
 
   // Check if we have to partition the block
-  if (freeBlock->size > 2 * sizeof(struct block) + size) {
+  if (freeBlock->size > sizeof(struct block) + size) {
     struct block * new = (struct block *) freeBlock + size + sizeof(struct block);
     new->previous = freeBlock;
     new->next = freeBlock->next;
@@ -52,13 +52,13 @@ static void * findMallocBlock(size_t size) {
     new->size = freeBlock->size - sizeof(struct block) - size;
     new->free = 1;
 
-    freeBlock->size = size;
-    freeBlock->next = new;
-    freeBlock->free = 0;
-
     if (freeBlock->next) {
         freeBlock->next->previous = new; 
     }
+
+    freeBlock->size = size;
+    freeBlock->next = new;
+    freeBlock->free = 0;
 
   } else { // We don't have to partition the block
     freeBlock->size = size;
@@ -185,9 +185,10 @@ void coalesceBlock(struct block * currBlock) {
             currBlock->next->previous = currBlock->previous;
         }
 
-        struct block * previousBlock = currBlock->next;
-        void * ptr = previousBlock + sizeof(struct block);
-        bzero(ptr, previousBlock->size);
+        // struct block * previousBlock = currBlock->next;
+        // void * ptr = previousBlock + sizeof(struct block);
+        // bzero(ptr, previousBlock->size);
+    
     }
 
     
@@ -206,13 +207,14 @@ void mm_free(void *ptr) {
     // Get the current block and set it all equal to 0s
     struct block * currBlock = (struct block *) (ptr - sizeof(struct block));
     currBlock->free = 1; 
-    bzero(ptr, currBlock->size);
+    // bzero(ptr, currBlock->size);
 
     // Get the next block for coalescing
     struct block * nextBlock = currBlock->next;
 
     // Check the previous block and the next block 
     struct block * previousBlock = currBlock->previous;
+
     if (previousBlock != NULL && previousBlock->free == 1) {
         coalesceBlock(currBlock);
     }
