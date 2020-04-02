@@ -216,10 +216,10 @@ void mm_free(void *ptr) {
     struct block * previousBlock = currBlock->previous;
 
     if (previousBlock != NULL && previousBlock->free == 1) {
-        coalesceBlock(currBlock);
+       // coalesceBlock(currBlock);
     }
     if (nextBlock != NULL && nextBlock->free == 1) {
-        coalesceBlock(nextBlock); 
+       // coalesceBlock(nextBlock); 
     }
 
 }
